@@ -2,6 +2,7 @@ use std::io::Cursor;
 
 use glium::Surface;
 mod teapot;
+mod model_loader;
 
 #[macro_use]
 extern crate glium;
@@ -23,7 +24,7 @@ impl Vertex {
 implement_vertex!(Vertex, position, tex_coords);
 
 const VERTEX_SHADER_SRC: &str = r#"
-#version 150
+        #version 150
         in vec3 position;
         
         in vec3 normal;
@@ -78,12 +79,13 @@ fn main() {
     let display = glium::Display::new(window_builder, context_builder, &event_loop)
         .expect("Error creating window");
 
-    let positions = glium::VertexBuffer::new(&display, &teapot::VERTICES).unwrap();
-    let normals = glium::VertexBuffer::new(&display, &teapot::NORMALS).unwrap();
+    let model = model_loader::load_file("./teapot-3.obj");
+    let positions = glium::VertexBuffer::new(&display, &model.vertices).unwrap();
+    let normals = glium::VertexBuffer::new(&display, &model.normals).unwrap();
     let indices = glium::IndexBuffer::new(
         &display,
         glium::index::PrimitiveType::TrianglesList,
-        &teapot::INDICES,
+        &model.indexes,
     )
     .unwrap();
     let program =
@@ -93,7 +95,7 @@ fn main() {
     let mut t: f32 = -0.5;
     event_loop.run(move |ev, _, control_flow| {
         let mut target = display.draw();
-        target.clear_color_and_depth((0.0, 0.0, 1.0, 1.0), 1.0);
+        target.clear_color_and_depth((0.12, 0.12, 0.12, 1.0), 1.0);
         let perspective = {
             let (width, height) = target.get_dimensions();
             let aspect_ratio = height as f32 / width as f32;
@@ -114,9 +116,9 @@ fn main() {
         let view = view_matrix(&[2.0, -1.0, 1.0], &[-2.0, 1.0, 1.0], &[0.0, 1.0, 0.0]);
         let uniforms = uniform! {
             model: [
-                [0.01, 0.0, 0.0, 0.0],
-                [0.0, 0.01, 0.0, 0.0],
-                [0.0, 0.0, 0.01, 0.0],
+                [0.1, 0.0, 0.0, 0.0],
+                [0.0, 0.1, 0.0, 0.0],
+                [0.0, 0.0, 0.1, 0.0],
                 [0.0, 0.0, 2.0, 1.0f32],
             ],
             view: view,
