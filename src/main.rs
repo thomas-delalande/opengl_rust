@@ -1,7 +1,6 @@
-use std::io::Cursor;
-
 use glium::Surface;
 mod teapot;
+mod font_loader;
 mod model_loader;
 
 #[macro_use]
@@ -13,14 +12,6 @@ struct Vertex {
     tex_coords: [f32; 2],
 }
 
-impl Vertex {
-    fn new(x: f32, y: f32, tx: f32, ty: f32) -> Self {
-        return Vertex {
-            position: [x, y],
-            tex_coords: [tx, ty],
-        };
-    }
-}
 implement_vertex!(Vertex, position, tex_coords);
 
 const VERTEX_SHADER_SRC: &str = r#"
@@ -69,6 +60,7 @@ const FRAGMENT_SHADER_SRC: &str = r#"
 "#;
 
 fn main() {
+    let image = font_loader::load_font("");
     println!("Starting window...");
 
     use glium::glutin;
